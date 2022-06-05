@@ -62,7 +62,7 @@ class DeTRLoss(tf.keras.losses.Loss):
             cost_class = -tf.gather(predicted_scores[batch_id], gt_labels[batch_id], axis=1)  # (N[preds], N[gt])
 
             gt_boxes_expanded = gt_boxes[batch_id][tf.newaxis, ...]  # (1, N, 4)
-            predicted_boxes_expanded = gt_boxes[batch_id][:, tf.newaxis, :]  # (N, 1, 4)
+            predicted_boxes_expanded = predicted_boxes[batch_id][:, tf.newaxis, :]  # (N, 1, 4)
 
             # (N[preds], N[gt])
             cost_boxes = self.regression_loss(y_true=gt_boxes_expanded, y_pred=predicted_boxes_expanded)
@@ -94,7 +94,7 @@ class DeTRLoss(tf.keras.losses.Loss):
 
             # Calculate loss values
             class_loss = self.classification_loss(y_true=sample_gt_scores, y_pred=sample_pred_scores)
-            box_l1_loss = tf.reduce_mean(self.regression_l1_loss(y_true=sample_gt_boxes, y_pred=sample_pred_boxes))
+            box_l1_loss = tf.reduce_mean(self.regression_loss(y_true=sample_gt_boxes, y_pred=sample_pred_boxes))
             box_giou_loss = tf.reduce_mean(self.generalized_iou_loss(y_true=sample_gt_boxes, y_pred=sample_pred_boxes))
 
             total_loss += self.cost_class_weight * class_loss + \
